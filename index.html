@@ -1058,13 +1058,364 @@ new Chart(document.getElementById('prognosChart'), {
 
 <!-- Winningtemp live-data — inbäddad direkt av hamta_winningtemp.py -->
 <script id="winningtemp-inline">// WT_DATA_START
-window.WINNINGTEMP_DATA = null;
+window.WINNINGTEMP_DATA = {
+  "fetched_at": "2026-06-18T16:08:42.083622",
+  "overall_current": 8.1,
+  "overall_prev": 8.0,
+  "monthly_trend": [
+    {
+      "month": 1,
+      "label": "Jan",
+      "score": 8.3,
+      "notEnoughData": false
+    },
+    {
+      "month": 2,
+      "label": "Feb",
+      "score": 8.0,
+      "notEnoughData": false
+    },
+    {
+      "month": 3,
+      "label": "Mar",
+      "score": 8.1,
+      "notEnoughData": false
+    },
+    {
+      "month": 4,
+      "label": "Apr",
+      "score": 8.3,
+      "notEnoughData": false
+    },
+    {
+      "month": 5,
+      "label": "Maj",
+      "score": 8.1,
+      "notEnoughData": false
+    },
+    {
+      "month": 6,
+      "label": "Jun",
+      "score": 8.4,
+      "notEnoughData": false
+    }
+  ],
+  "matched_managers": [
+    {
+      "manager_name": "Daniel Garpenfeldt",
+      "team_name": "Team_Daniel Garpenfeldt",
+      "score_current": 5.9,
+      "score_prev": 7.2,
+      "not_enough_data": false
+    },
+    {
+      "manager_name": "Josefine Carlsson",
+      "team_name": "Team_Josefine Carlsson",
+      "score_current": null,
+      "score_prev": null,
+      "not_enough_data": true
+    },
+    {
+      "manager_name": "Henning Ahlström",
+      "team_name": "team_Henning Ahlström",
+      "score_current": null,
+      "score_prev": null,
+      "not_enough_data": true
+    },
+    {
+      "manager_name": "Anders Bergman",
+      "team_name": "team_Anders Bergman",
+      "score_current": 7.8,
+      "score_prev": 7.8,
+      "not_enough_data": false
+    },
+    {
+      "manager_name": "Tomas Kaipe",
+      "team_name": "team_Tomas Kaipe",
+      "score_current": 7.9,
+      "score_prev": 8.1,
+      "not_enough_data": false
+    },
+    {
+      "manager_name": "BFF",
+      "team_name": "team_BFF",
+      "score_current": null,
+      "score_prev": null,
+      "not_enough_data": true
+    },
+    {
+      "manager_name": "Göran Hising",
+      "team_name": "team_Göran Hising",
+      "score_current": 8.8,
+      "score_prev": 7.4,
+      "not_enough_data": false
+    },
+    {
+      "manager_name": "Susanne Nordvall",
+      "team_name": "team_Susanne Nordvall",
+      "score_current": null,
+      "score_prev": null,
+      "not_enough_data": true
+    },
+    {
+      "manager_name": "Magnus Cronberg",
+      "team_name": "team_Magnus Cronberg",
+      "score_current": null,
+      "score_prev": null,
+      "not_enough_data": true
+    },
+    {
+      "manager_name": "Konsultchef",
+      "team_name": "team_Konsultchef",
+      "score_current": null,
+      "score_prev": null,
+      "not_enough_data": true
+    },
+    {
+      "manager_name": " Andreas Hammarbäck",
+      "team_name": "team_ Andreas Hammarbäck",
+      "score_current": 8.3,
+      "score_prev": 7.3,
+      "not_enough_data": false
+    },
+    {
+      "manager_name": "Katarina Appelqvist",
+      "team_name": "team_Katarina Appelqvist",
+      "score_current": 8.8,
+      "score_prev": 8.9,
+      "not_enough_data": false
+    },
+    {
+      "manager_name": "Christian Lauritzen",
+      "team_name": "team_Christian Lauritzen",
+      "score_current": null,
+      "score_prev": null,
+      "not_enough_data": true
+    }
+  ],
+  "query_periods": {
+    "current": {
+      "start": "2026-03-20",
+      "end": "2026-06-18"
+    },
+    "previous": {
+      "start": "2025-12-20",
+      "end": "2026-03-19"
+    }
+  }
+};
 // WT_DATA_END
 </script>
 
 <!-- Netigate live-data — inbäddad direkt av hamta_netigate.py -->
 <script id="netigate-inline">// NT_DATA_START
-window.NETIGATE_DATA = null;
+window.NETIGATE_DATA = {
+  "fetched_at": "2026-06-18T16:09:31.381679",
+  "survey_id": "991213",
+  "total_responses": 211,
+  "total_sent": null,
+  "response_rate": null,
+  "nps": {
+    "score": -2,
+    "promoters": 60,
+    "passives": 43,
+    "detractors": 63,
+    "total": 166,
+    "avg": 6.8
+  },
+  "top_words": [
+    {
+      "word": "uppdrag",
+      "count": 153
+    },
+    {
+      "word": "varit",
+      "count": 88
+    },
+    {
+      "word": "bolag",
+      "count": 68
+    },
+    {
+      "word": "väldigt",
+      "count": 64
+    },
+    {
+      "word": "sannolikt",
+      "count": 64
+    },
+    {
+      "word": "kollegor",
+      "count": 59
+    },
+    {
+      "word": "chef",
+      "count": 54
+    },
+    {
+      "word": "haft",
+      "count": 54
+    },
+    {
+      "word": "utan",
+      "count": 48
+    },
+    {
+      "word": "från",
+      "count": 48
+    },
+    {
+      "word": "många",
+      "count": 45
+    },
+    {
+      "word": "konsult",
+      "count": 45
+    },
+    {
+      "word": "något",
+      "count": 44
+    },
+    {
+      "word": "inom",
+      "count": 42
+    },
+    {
+      "word": "tycker",
+      "count": 42
+    },
+    {
+      "word": "kommer",
+      "count": 39
+    },
+    {
+      "word": "lite",
+      "count": 39
+    },
+    {
+      "word": "andra",
+      "count": 37
+    },
+    {
+      "word": "fått",
+      "count": 37
+    },
+    {
+      "word": "bolaget",
+      "count": 35
+    }
+  ],
+  "exit_factors": [
+    {
+      "factor": "Jag har känt mig inkluderad i B3s kultur",
+      "avg": 3.86,
+      "count": 198
+    },
+    {
+      "factor": "Ledare och kollegor lever B3s värderingar",
+      "avg": 3.81,
+      "count": 187
+    },
+    {
+      "factor": "Jag har utvecklats på B3",
+      "avg": 3.8,
+      "count": 208
+    },
+    {
+      "factor": "Ledarskapet (din närmaste chef på B3)",
+      "avg": 3.77,
+      "count": 209
+    },
+    {
+      "factor": "Konsultaktiviteter",
+      "avg": 3.75,
+      "count": 185
+    },
+    {
+      "factor": "Arbetsbelastning",
+      "avg": 3.69,
+      "count": 204
+    },
+    {
+      "factor": "Team B3-aktiviteter",
+      "avg": 3.66,
+      "count": 149
+    },
+    {
+      "factor": "Jag har känt mig betydelsefull under min tid på B3",
+      "avg": 3.61,
+      "count": 205
+    },
+    {
+      "factor": "Min tid på B3 motsvarande mina förväntningar",
+      "avg": 3.5,
+      "count": 205
+    },
+    {
+      "factor": "Möjligheten att jobba tillsammans med B3-kollegor",
+      "avg": 3.2,
+      "count": 184
+    },
+    {
+      "factor": "Lön och förmåner",
+      "avg": 3.17,
+      "count": 415
+    },
+    {
+      "factor": "Karriärmöjligheter",
+      "avg": 3.01,
+      "count": 399
+    },
+    {
+      "factor": "Samarbetet inom B3-koncernen",
+      "avg": 2.96,
+      "count": 165
+    },
+    {
+      "factor": "Kompetensutveckling",
+      "avg": 2.9,
+      "count": 412
+    },
+    {
+      "factor": "Dina senaste konsultuppdrag",
+      "avg": 2.46,
+      "count": 206
+    },
+    {
+      "factor": "Ledarskap (din närmaste chef på B3)",
+      "avg": 2.21,
+      "count": 207
+    },
+    {
+      "factor": "Brist på feedback",
+      "avg": 2.08,
+      "count": 209
+    },
+    {
+      "factor": "För låg arbetsbelastning",
+      "avg": 1.68,
+      "count": 204
+    },
+    {
+      "factor": "För hög arbetsbelastning",
+      "avg": 1.5,
+      "count": 208
+    }
+  ],
+  "gender": {
+    "Man": 138,
+    "Kvinna": 68,
+    "Vill ej uppge": 5
+  },
+  "tenure_at_b3": {
+    "Kortare än 1 år": 37,
+    "3-5 år": 81,
+    "1-2 år": 56,
+    "6-10 år": 29,
+    "10 år eller mer": 8
+  },
+  "free_text_count": 768
+};
 // NT_DATA_END
 </script>
 

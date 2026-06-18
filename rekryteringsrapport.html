@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekryteringsrapport — B3 2026</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #EEE8E4; color: #212121; }
+
+        /* Header zebra */
+        .header {
+            position: relative; overflow: hidden; height: 86px;
+            display: flex; align-items: center; padding: 0 32px;
+        }
+        .header::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: repeating-linear-gradient(52deg,#000 0,#000 18px,#fff 18px,#fff 34px);
+        }
+        .header::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 24px;
+            background: #EEE8E4;
+        }
+        .header-inner {
+            position: relative; z-index: 2;
+            display: flex; align-items: center; justify-content: space-between; width: 100%;
+        }
+        .b3-badge {
+            background: #06A6A7; border-radius: 10px;
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-right: 14px;
+            font-size: 20px; font-weight: 900; color: #fff; letter-spacing: -1px;
+        }
+        .header-title { display: flex; align-items: center; }
+        .header-text h1 {
+            font-size: 18px; font-weight: 800; color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.55); letter-spacing: -0.3px;
+        }
+        .header-text .sub {
+            font-size: 11px; color: rgba(255,255,255,0.7);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-top: 2px;
+        }
+        .header-right { display: flex; align-items: center; gap: 14px; }
+        .data-badge { background: #EFBD47; color: #212121; padding: 5px 12px; border-radius: 6px; font-size: 10px; font-weight: 800; letter-spacing: 0.02em; }
+        .header-period .period { font-size: 15px; font-weight: 800; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.5); text-align: right; }
+        .header-period .updated { font-size: 10px; color: rgba(255,255,255,0.55); text-shadow: 0 1px 3px rgba(0,0,0,0.4); text-align: right; margin-top: 2px; }
+
+        /* Filters */
+        .filters { background: #fff; padding: 9px 32px; border-bottom: 2px solid #06A6A7; display: flex; gap: 20px; align-items: center; }
+        .fl { font-size: 11px; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        select { border: 1px solid #ddd; border-radius: 5px; padding: 5px 10px; font-size: 12px; color: #212121; cursor: pointer; background: #fafafa; }
+
+        /* Layout */
+        .content { padding: 18px 32px 44px; max-width: 1440px; margin: 0 auto; }
+        .sec {
+            font-size: 10px; font-weight: 800; color: #06A6A7;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            margin: 22px 0 9px; display: flex; align-items: center; gap: 8px;
+        }
+        .sec::after { content: ''; flex: 1; height: 1px; background: #06A6A7; opacity: 0.25; }
+        .sec-note { font-size: 10px; color: #bbb; font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+        /* Cards */
+        .card { background: #fff; border-radius: 8px; padding: 15px 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-top: 3px solid #06A6A7; }
+        .card-title { font-size: 13px; font-weight: 700; color: #212121; }
+        .card-sub { font-size: 11px; color: #aaa; margin-top: 2px; margin-bottom: 12px; }
+
+        /* KPIs */
+        .kpi-row { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr 1fr; gap: 12px; }
+        .kpi { background: #fff; border-radius: 8px; padding: 15px 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-top: 3px solid #06A6A7; }
+        .kpi.accent { background: #06A6A7; border-top-color: #008081; }
+        .kpi-lbl { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
+        .kpi.accent .kpi-lbl { color: rgba(255,255,255,0.6); }
+        .kpi-val { font-size: 38px; font-weight: 900; color: #212121; line-height: 1.0; margin: 5px 0 3px; letter-spacing: -1px; }
+        .kpi.accent .kpi-val { color: #fff; }
+        .kpi-note { font-size: 10px; color: #bbb; }
+        .kpi.accent .kpi-note { color: rgba(255,255,255,0.5); }
+        .kpi-delta { font-size: 11px; font-weight: 700; margin-top: 5px; }
+        .pos { color: #06A6A7; } .neg { color: #DF668A; } .neu { color: #888; }
+
+        /* Grids */
+        .g2 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+        .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .g22 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .g33 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .insight-item { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; font-size: 12px; line-height: 1.5; color: #333; }
+        .insight-item .b { margin-top: 1px; flex-shrink: 0; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; padding: 7px 10px; border-bottom: 2px solid #EEE8E4; white-space: nowrap; }
+        td { padding: 8px 10px; border-bottom: 1px solid #f5f2ef; color: #333; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #faf8f6; }
+        .total-row td { background: #f0ece8; font-weight: 700; }
+
+        /* Badges */
+        .b { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+        .b-g { background: #d0f0f0; color: #005f60; }
+        .b-r { background: #fde8ef; color: #b0194a; }
+        .b-y { background: #fdf3d0; color: #7a5a00; }
+        .b-b { background: #dce8f8; color: #1a4a8a; }
+        .b-gr { background: #f0ece8; color: #555; }
+        .b-p { background: #fde8ef; color: #DF668A; }
+        .b-o { background: #fff0e0; color: #a05000; }
+
+        /* Progress */
+        .pb { background: #EEE8E4; border-radius: 3px; height: 5px; overflow: hidden; display: inline-block; width: 60px; vertical-align: middle; }
+        .pf { height: 100%; border-radius: 3px; }
+        .pf-g { background: #06A6A7; } .pf-y { background: #EFBD47; } .pf-r { background: #DF668A; } .pf-b { background: #426DA9; }
+
+        /* Sentiment */
+        .sent-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f5f2ef; }
+        .sent-row:last-child { border-bottom: none; }
+        .sent-lbl { flex: 1; font-size: 12px; }
+        .sent-bar .pb { width: 90px; height: 6px; }
+        .sent-score { width: 30px; text-align: right; font-size: 13px; font-weight: 800; }
+
+        /* Alerts */
+        .alert { padding: 8px 11px; border-left: 3px solid; border-radius: 0 5px 5px 0; margin-top: 8px; font-size: 11px; line-height: 1.5; }
+        .al-w { border-color: #EFBD47; background: #fdf9ea; color: #6a4800; }
+        .al-r { border-color: #DF668A; background: #fdf0f5; color: #8a1a3a; }
+        .al-b { border-color: #06A6A7; background: #e8f7f7; color: #005a5b; }
+        .al-gr { border-color: #ccc; background: #f9f7f5; color: #555; }
+
+        /* Tags */
+        .tag { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; margin: 2px; }
+        .tag-r { background: #fde8ef; color: #b0194a; }
+        .tag-b { background: #e8f7f7; color: #005a5b; }
+
+        /* Quote */
+        .quote { font-size: 11px; color: #555; background: #f9f7f5; padding: 9px 12px; border-left: 3px solid #e0dbd6; border-radius: 0 5px 5px 0; margin-bottom: 6px; font-style: italic; line-height: 1.5; }
+
+        /* Misc */
+        .src { font-size: 10px; color: #ccc; margin-top: 10px; text-align: right; }
+        .chart-wrap { position: relative; }
+        .tg-hdr { font-size: 10px; font-weight: 800; color: #06A6A7; text-transform: uppercase; letter-spacing: 0.05em; margin: 12px 0 6px; }
+        .placeholder-note { font-size: 11px; color: #bbb; font-style: italic; padding: 16px 0; text-align: center; }
+
+        /* Netto pill big */
+        .netto-neg { color: #DF668A; }
+        .netto-pos { color: #06A6A7; }
+
+        .page-footer {
+            height: 12px; margin-top: 8px;
+            background-image: repeating-linear-gradient(52deg,#000 0,#000 10px,#fff 10px,#fff 20px);
+            opacity: 0.18;
+        }
+        .api-waiting { background: #f9f7f5; border: 1px dashed #ccc; border-radius: 6px; padding: 14px; text-align: center; font-size: 11px; color: #aaa; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-inner">
+        <div class="header-title">
+            <div class="b3-badge">b3</div>
+            <div class="header-text">
+                <h1>Rekryteringsrapport 2026</h1>
+                <div class="sub">Konsulter exkl. OH-personal · Exkl. B3 Zenith &amp; B3 Now · Källa: Excel-export SDwork</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="data-badge">✓ RIKTIG DATA</span>
+            <div class="header-period">
+                <div class="period">Jan–Maj 2026</div>
+                <div class="updated">YTD · Senaste complete: Maj 2026</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="filters">
+    <span class="fl">Bolag:</span>
+    <select>
+        <option>Alla bolag</option>
+        <option>B3 Healthcare Consulting AB</option>
+        <option>B3 Vibe AB</option>
+        <option>B3 Business Transformation AB</option>
+        <option>B3 Skilled AB</option>
+        <option>B3 Upphandling AB</option>
+        <option>B3 Next AB</option>
+        <option>B3 Financial Consulting AB</option>
+        <option>B3 Connect AB</option>
+        <option>B3 HealthTech AB</option>
+        <option>B3 Elevate AB</option>
+        <option>Rebel and Bird AB</option>
+    </select>
+    <span class="fl">Period:</span>
+    <select>
+        <option>Jan–Maj 2026 (YTD)</option>
+        <option>Maj 2026</option>
+        <option>April 2026</option>
+        <option>Mars 2026</option>
+        <option>Feb 2026</option>
+        <option>Jan 2026</option>
+    </select>
+    <span class="fl">Affärsområde:</span>
+    <select>
+        <option>Alla</option>
+        <option>Management</option>
+        <option>Development</option>
+        <option>Cloud &amp; Technology</option>
+    </select>
+</div>
+
+<div class="content">
+
+    <!-- KPIs YTD Jan-Maj -->
+    <div class="sec">YTD Jan–Maj 2026 — Månadsöversikt <span class="sec-note">36 nyanst · 57 avslut · Prognos P04 + Målprocess tillkopplad</span></div>
+    <div class="kpi-row">
+        <div class="kpi accent">
+            <div class="kpi-lbl">Netto YTD</div>
+            <div class="kpi-val netto-neg">−21</div>
+            <div class="kpi-note">Brutto in 36 − Avslut 57</div>
+            <div class="kpi-delta" style="color:rgba(255,255,255,0.7);">Jan–Maj 2026</div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-lbl">Brutto in YTD</div>
+            <div class="kpi-val">36</div>
+            <div class="kpi-note">Nyanställda konsulter</div>
+            <div class="kpi-delta neu">Exkl. intressebolag</div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-lbl">Avslut YTD</div>
+            <div class="kpi-val">57</div>
+            <div class="kpi-note">Avslutade anst.</div>
+            <div class="kpi-delta neg">↑ 82% frivilliga avg.</div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-lbl">Headcount</div>
+            <div class="kpi-val">525</div>
+            <div class="kpi-note">Aktiva konsulter maj 2026</div>
+            <div class="kpi-delta neu">Exkl. intressebolag</div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-lbl">Oms.frekvens YTD</div>
+            <div class="kpi-val" style="font-size:30px;">13%</div>
+            <div class="kpi-note">57/525 × 12/5 = 26% ann.</div>
+            <div class="kpi-delta neg">Branschsnitt ~15–20%</div>
+        </div>
+    </div>
+
+    <!-- Månadsgraf -->
+    <div class="sec">Månatlig utveckling <span class="sec-note">Jan–Maj 2026 aktual · Jun–Sep planerat</span></div>
+    <div class="g2">
+        <div class="card">
+            <div class="card-title">Brutto in vs Avslut per månad</div>
+            <div class="card-sub">Konsulter exkl. intressebolag · Jan–Maj aktual · Jun–Sep planerat (ljusare staplar)</div>
+            <div class="chart-wrap" style="height:215px;">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Ackumulerat netto YTD</div>
+            <div class="card-sub">Kumulativt netto per månad 2026</div>
+            <div class="chart-wrap" style="height:215px;">
+                <canvas id="nettoChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export</div>
+        </div>
+    </div>
+
+    <!-- Avgångsanalys -->
+    <div class="sec">Avgångsanalys — SDwork <span class="sec-note">Jan–Maj 2026 · 57 avslut · 83% frivilliga</span></div>
+    <div class="g3">
+        <div class="card">
+            <div class="card-title">Avgångsorsak</div>
+            <div class="card-sub">57 avslut · Jan–Maj 2026 · 82% frivilliga (Eigen begäran)</div>
+            <div class="chart-wrap" style="height:200px;">
+                <canvas id="reasonChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Vart byter de jobb? — Eigen begäran</div>
+            <div class="card-sub">47 frivilliga avslut Jan–Maj · Destination efter B3</div>
+            <div class="chart-wrap" style="height:200px;">
+                <canvas id="byterTillChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Kön — nyanställda vs avslut</div>
+            <div class="card-sub">Jan–Maj 2026 · Konsulter</div>
+            <div class="chart-wrap" style="height:200px;">
+                <canvas id="konChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export</div>
+        </div>
+    </div>
+
+    <!-- Anställningstid & Säsongsmönster -->
+    <div class="sec">Anställningstid &amp; Säsongsmönster <span class="sec-note">SDwork · Jan–Maj 2026 aktual</span></div>
+    <div class="g22">
+        <div class="card">
+            <div class="card-title">Anställningstid vid avslut</div>
+            <div class="card-sub">57 avslut · Störst risk: 3–5 år (33% av alla avslut)</div>
+            <div class="chart-wrap" style="height:200px;">
+                <canvas id="tenureChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Säsongsmönster — In vs Ut per månad</div>
+            <div class="card-sub">Jun ej komplett · Avsluten ökar varje månad</div>
+            <div class="chart-wrap" style="height:200px;">
+                <canvas id="seasonChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export</div>
+        </div>
+    </div>
+
+    <!-- Omsättningsfrekvens & Headcount -->
+    <div class="sec">Omsättningsfrekvens &amp; Headcount <span class="sec-note">525 aktiva konsulter · Jan–Maj 2026 · Annualiserat (×12/5)</span></div>
+    <div class="g2">
+        <div class="card">
+            <div class="card-title">Omsättningsfrekvens per bolag — Annualiserad %</div>
+            <div class="card-sub">Avslut Jan–Maj / headcount × 12/5 · Branschsnitt ~15–20% · ≥40% = kritisk</div>
+            <div class="chart-wrap" style="height:320px;">
+                <canvas id="turnoverChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export · Headcount-snapshot maj 2026</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Headcount per bolag — Aktiva konsulter</div>
+            <div class="card-sub">Total styrka maj 2026 · Exkl. B3 Zenith &amp; B3 Now · 525 totalt</div>
+            <div class="chart-wrap" style="height:320px;">
+                <canvas id="headcountChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork headcount-export maj 2026</div>
+        </div>
+    </div>
+
+    <!-- Per bolag -->
+    <div class="sec">Per bolag — Jan–Maj 2026 <span class="sec-note">Prognos och målprocess väntar Cumulus API</span></div>
+    <div class="card">
+        <div class="card-title">Bolagsöversikt · Sorterat efter antal avslut</div>
+        <div class="card-sub">Exkl. B3 Zenith AB &amp; B3 Now AB · 25 bolag</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Bolag</th>
+                    <th>Brutto in</th>
+                    <th>Avslut</th>
+                    <th>Netto</th>
+                    <th>Headcount</th>
+                    <th>Oms.freq. ann.</th>
+                    <th>Avslut/Brutto</th>
+                    <th title="Prognos P04 netto Jun–Dec 2026 per bolag">P04 Jun–Dec</th>
+                </tr>
+            </thead>
+            <tbody id="bolag-tbody">
+                <!-- Fylls av JS nedan -->
+            </tbody>
+        </table>
+        <div class="src">Källa: SDwork Excel-export · P04-prognos per bolag Jun–Dec 2026</div>
+    </div>
+
+    <!-- Maj 2026 avslut - individuell tabell -->
+    <div class="sec">Individuella avslut — Maj 2026 <span class="sec-note">16 avslut · 5 nyanst · Netto −11</span></div>
+    <div class="card">
+        <div class="card-title">Avslutade anställningar · Maj 2026</div>
+        <div class="card-sub">Konsulter exkl. OH, B3 Zenith &amp; B3 Now</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Namn</th><th>Bolag</th><th>Titel</th>
+                    <th>Anst. sedan</th><th>Slutdatum</th>
+                    <th>Orsak</th><th>Chef</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Anders Sundheden</td><td>B3 Digital Worklife AB</td><td>Konsultchef &amp; Senior Konsult</td><td>2017-04-03</td><td>2026-05-06</td><td><span class="b b-y">Egen begäran</span></td><td>Per-Ola Löwing</td></tr>
+                <tr><td>Pontus Grensman</td><td>B3 Business Transformation AB</td><td>Seniorkonsult</td><td>2019-08-15</td><td>2026-05-07</td><td><span class="b b-y">Egen begäran</span></td><td>Kajsa Nordström Hertzell</td></tr>
+                <tr><td>Kristoffer Kulinski</td><td>B3 Indes AB</td><td>Data Engineer</td><td>2022-09-19</td><td>2026-05-08</td><td><span class="b b-y">Egen begäran</span></td><td>Mats Erkers</td></tr>
+                <tr><td>Timo Pohto</td><td>B3 Visab Consulting AB</td><td>Senior konsult</td><td>2025-08-30</td><td>2026-05-08</td><td><span class="b b-y">Egen begäran</span></td><td>Göran Hising</td></tr>
+                <tr><td>Michael Carlberg</td><td>B3 Vibe AB</td><td>Seniorkonsult</td><td>2025-04-16</td><td>2026-05-13</td><td><span class="b b-r">Avskedande</span></td><td>Pernilla Nilsson</td></tr>
+                <tr><td>Angelique Eskilstorp</td><td>B3 Healthcare Consulting AB</td><td>Verksamhetskonsult/Konsultchef</td><td>2017-10-01</td><td>2026-05-15</td><td><span class="b b-y">Egen begäran</span></td><td>Cathrine Yankoulofski</td></tr>
+                <tr><td>Ola Lindquist</td><td>B3 Connect AB</td><td>Systemutvecklare</td><td>2025-10-01</td><td>2026-05-15</td><td><span class="b b-y">Egen begäran</span></td><td>Eva Clavin</td></tr>
+                <tr><td>Anders Wikström</td><td>B3 Commit AB</td><td>Systemutvecklare</td><td>2017-06-05</td><td>2026-05-16</td><td><span class="b b-y">Egen begäran</span></td><td>Ola Mellberg</td></tr>
+                <tr><td>Hanna Björk</td><td>B3 Skilled AB</td><td>Software Developer</td><td>2022-10-17</td><td>2026-05-22</td><td><span class="b b-o">Överenskommelse</span></td><td>Daniella Meyerson</td></tr>
+                <tr><td>Michael Humer</td><td>B3 Business Transformation AB</td><td>Senior konsult</td><td>2023-05-15</td><td>2026-05-24</td><td><span class="b b-y">Egen begäran</span></td><td>Kajsa Nordström Hertzell</td></tr>
+                <tr><td>Bardia Fathi</td><td>B3 Financial Consulting AB</td><td>Seniorkonsult</td><td>2024-04-15</td><td>2026-05-27</td><td><span class="b b-y">Egen begäran</span></td><td>Ann-Charlotte Olsson</td></tr>
+                <tr><td>Kajsa Samuelson</td><td>B3 Business Transformation AB</td><td>Seniorkonsult</td><td>2025-05-14</td><td>2026-05-31</td><td><span class="b b-o">Överenskommelse</span></td><td>Anders Bergman</td></tr>
+                <tr><td>Gustav Gillberg</td><td>B3 Upphandling AB</td><td>Senior Upphandlingskonsult</td><td>2019-02-18</td><td>2026-05-31</td><td><span class="b b-y">Egen begäran</span></td><td>Magnus Cronberg</td></tr>
+                <tr><td>Torbjörn Karlsson</td><td>B3 Networks AB</td><td>Senior Nätverkstekniker</td><td>2019-08-12</td><td>2026-05-31</td><td><span class="b b-o">Överenskommelse</span></td><td>Åsa Hofvander</td></tr>
+                <tr><td>Simon Irengård Gullstrand</td><td>B3 Beyond AB</td><td>Konsult</td><td>2021-10-01</td><td>2026-05-31</td><td><span class="b b-y">Egen begäran</span></td><td>Hanna Winsö</td></tr>
+                <tr><td>Mikael Sjöberg</td><td>B3 Beyond AB</td><td>Konsult</td><td>2022-01-17</td><td>2026-05-31</td><td><span class="b b-y">Egen begäran</span></td><td>Hanna Winsö</td></tr>
+            </tbody>
+        </table>
+        <div class="src">Källa: SDwork Excel-export · Destination (vart de går) tillkommer vid API-koppling</div>
+    </div>
+
+    <!-- Chefstrender (SDwork-data) -->
+    <div class="sec">Chefstrender — SDwork data <span class="sec-note">Baserat på Excel-export · Ledarskapsindex tillkommer via Winningtemp API</span></div>
+    <div class="g22">
+        <div class="card">
+            <div class="card-title">Chefer med flest avslut — YTD (alla månader)</div>
+            <div class="card-sub">Konsulter exkl. intressebolag</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Chef</th><th>Bolag</th><th>Avslut tot.</th><th>Bolag</th><th>Ledarskapsindex</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ludwig Falkman</strong></td>
+                        <td>B3 Engage AB</td>
+                        <td><span class="b b-r">8</span></td>
+                        <td>Jan, Aug×2, Sep×4, Okt</td>
+                        <td><span class="b b-gr">Väntar Winningtemp</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kajsa Nordström Hertzell</strong></td>
+                        <td>B3 Business Transf.</td>
+                        <td><span class="b b-r">5</span></td>
+                        <td>Mar, Maj×2, Jun, Jul</td>
+                        <td><span class="b b-gr">Väntar Winningtemp</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Patrik Zlatkovic</strong></td>
+                        <td>B3 Skilled AB</td>
+                        <td><span class="b b-r">5</span></td>
+                        <td>Mar×2, Apr, Jun, Jul</td>
+                        <td><span class="b b-gr">Väntar Winningtemp</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Daniella Meyerson</strong></td>
+                        <td>B3 Skilled AB</td>
+                        <td><span class="b b-y">4</span></td>
+                        <td>Jan, Maj, Jul, Aug</td>
+                        <td><span class="b b-gr">Väntar Winningtemp</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Per-Ola Löwing</strong></td>
+                        <td>B3 Digital Worklife AB</td>
+                        <td><span class="b b-y">4</span></td>
+                        <td>Apr×2, Maj, Aug</td>
+                        <td><span class="b b-gr">Väntar Winningtemp</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hanna Winsö</strong></td>
+                        <td>B3 Beyond AB</td>
+                        <td><span class="b b-y">3</span></td>
+                        <td>Apr, Maj×2</td>
+                        <td><span class="b b-gr">Väntar Winningtemp</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="alert al-r">🔴 B3 Skilled AB: 2 olika chefer med 5+4 avslut (Zlatkovic &amp; Meyerson) — kräver uppföljning</div>
+            <div class="alert al-w">⚠ B3 Business Transformation AB: 0 nyanst, 5 avslut YTD — strukturell avgångstrend</div>
+            <div class="src">Källa: SDwork · Ledarskapsindex kopplas via Winningtemp API</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Avslut per bolag — chart</div>
+            <div class="card-sub">Topp 8 bolag med flest avslut Jan–Maj 2026</div>
+            <div class="chart-wrap" style="height:260px;">
+                <canvas id="bolagChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export</div>
+        </div>
+    </div>
+
+    <!-- Winningtemp -->
+    <div class="sec">Chefstrender — Winningtemp <span class="sec-note" id="wt-status">Kör hamta_winningtemp.py för att ladda live-data</span></div>
+    <div id="wt-section">
+        <div class="card">
+            <div class="api-waiting" id="wt-waiting">
+                <div style="font-size:24px;margin-bottom:8px;">🔌</div>
+                <div style="font-size:12px;color:#888;font-weight:600;">Kör <code>python hamta_winningtemp.py</code> och ladda om sidan</div>
+                <div style="font-size:11px;color:#bbb;margin-top:4px;">Genererar winningtemp_data.js i samma mapp som HTML-filen</div>
+            </div>
+            <div id="wt-loaded" style="display:none;">
+                <div class="g22">
+                    <div>
+                        <div class="card-title">Chefer med flest avslut — ledarskapsindex</div>
+                        <div class="card-sub" id="wt-period">Senaste 90 dagarna</div>
+                        <table id="wt-manager-table">
+                            <thead>
+                                <tr>
+                                    <th>Chef (SDwork)</th>
+                                    <th>Team (Winningtemp)</th>
+                                    <th>Avslut YTD</th>
+                                    <th>Index nu</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wt-manager-body">
+                            </tbody>
+                        </table>
+                        <div id="wt-alerts"></div>
+                        <div class="src" id="wt-src"></div>
+                    </div>
+                    <div>
+                        <div class="card-title">Ledarskapsindex per grupp — trend</div>
+                        <div class="card-sub">Månadsvis 2026</div>
+                        <div class="chart-wrap" style="height:220px;">
+                            <canvas id="wtTrendChart"></canvas>
+                        </div>
+                        <div class="src">Källa: Winningtemp API</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WT korrelation -->
+    <div class="sec">Winningtemp-index vs avgångsfrekvens <span class="sec-note">Per chef · X = ledarskapsindex · Y = antal avslut</span></div>
+    <div class="g2">
+        <div class="card">
+            <div class="card-title">Ledarskapsindex vs Avslut per chef</div>
+            <div class="card-sub">Varje punkt = en chef · Lågt index + många avslut = riskzon · Laddas från Winningtemp</div>
+            <div id="wt-scatter-waiting" class="api-waiting" style="margin-top:8px;">
+                <div style="font-size:11px;color:#bbb;">Kör <code>python3 hamta_winningtemp.py</code> för att aktivera</div>
+            </div>
+            <div id="wt-scatter-loaded" style="display:none;">
+                <div class="chart-wrap" style="height:260px;">
+                    <canvas id="wtScatterChart"></canvas>
+                </div>
+            </div>
+            <div class="src">Källa: Winningtemp API + SDwork Excel-export</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Riskmatris — Chefer att bevaka</div>
+            <div class="card-sub">Lågt WT-index (&lt;7) + ≥2 avslut = prioritet</div>
+            <div id="wt-risk-waiting" class="api-waiting" style="margin-top:8px;">
+                <div style="font-size:11px;color:#bbb;">Aktiveras när Winningtemp-data laddas</div>
+            </div>
+            <div id="wt-risk-body" style="display:none;margin-top:8px;"></div>
+            <div class="src">Källa: Winningtemp API + SDwork Excel-export</div>
+        </div>
+    </div>
+
+    <!-- Netigate exitundersökning -->
+    <div class="sec" id="netigate-sec">Exitundersökning — Netigate <span class="sec-note" id="netigate-sec-note">Survey 991213 · Laddar…</span></div>
+
+    <!-- Väntar på data -->
+    <div id="netigate-waiting" class="card" style="display:block;">
+        <div class="api-waiting">
+            <div style="font-size:24px;margin-bottom:8px;">⏳</div>
+            <div style="font-size:12px;color:#888;font-weight:600;">Laddar Netigate-data…</div>
+            <div style="font-size:11px;color:#bbb;margin-top:4px;">Kör <code>python3 hamta_netigate.py</code> om detta visas länge</div>
+        </div>
+    </div>
+
+    <!-- Rad 1: NPS + Avgångsfaktorer + Översikt -->
+    <div id="netigate-loaded" style="display:none;grid-template-columns:1fr 2fr 1fr;gap:12px;">
+
+        <!-- NPS-kort -->
+        <div class="card">
+            <div class="card-title">Medarbetar-NPS (eNPS)</div>
+            <div class="card-sub">Rekommenderar du B3 som arbetsgivare? (0–10)</div>
+            <div id="nt-nps-body" style="margin-top:12px;text-align:center;">
+                <div id="nt-nps-score" style="font-size:52px;font-weight:900;letter-spacing:-2px;line-height:1;"></div>
+                <div id="nt-nps-label" style="font-size:11px;color:#888;margin-top:4px;"></div>
+                <div id="nt-nps-bars" style="margin-top:14px;display:flex;gap:6px;height:24px;border-radius:4px;overflow:hidden;"></div>
+                <div id="nt-nps-legend" style="margin-top:6px;display:flex;justify-content:space-between;font-size:10px;color:#888;"></div>
+            </div>
+            <div id="nt-nps-none" style="display:none;" class="api-waiting">
+                <div style="font-size:11px;color:#bbb;">Ingen NPS-fråga hittades i svaren</div>
+            </div>
+        </div>
+
+        <!-- Avgångsfaktorer -->
+        <div class="card">
+            <div class="card-title">Avgångsfaktorer — Inverkan (1–5)</div>
+            <div class="card-sub">Genomsnitt per faktor · Alla genomförda exitenkäter</div>
+            <div style="position:relative;height:320px;margin-top:10px;">
+                <canvas id="factorChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Undersökningsöversikt -->
+        <div class="card">
+            <div class="card-title">Undersökningsöversikt</div>
+            <div class="card-sub">Svarsfördelning exitenkäten</div>
+            <div id="nt-overview" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;font-size:12px;">
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:#888;">Genomförda svar</span>
+                    <span id="nt-resp-count" style="font-weight:800;"></span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:#888;">Svarsfrekvens</span>
+                    <span id="nt-resp-rate" style="font-weight:800;"></span>
+                </div>
+                <hr style="border:none;border-top:1px solid #e8e4e0;margin:4px 0;">
+                <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;">Kön (survey)</div>
+                <div id="nt-gender" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+                <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-top:4px;">Anställningstid (vid exit)</div>
+                <div id="nt-tenure" style="display:flex;flex-direction:column;gap:4px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prognos & Målprocess -->
+    <div class="sec">Prognos P04 &amp; Målprocess 2026 <span class="sec-note">Nettoutveckling per månad · Aktual Jan–Maj · Prognos P04 Jun–Dec</span></div>
+    <div class="g2">
+        <div class="card">
+            <div class="card-title">Utfall vs Prognos P04 vs Målprocess — Ackumulerat netto</div>
+            <div class="card-sub">Faktisk nettoutveckling (Jan–Maj) · Prognos P04 (Jun–Dec) · Målprocess 2026</div>
+            <div class="chart-wrap" style="height:230px;">
+                <canvas id="prognosChart"></canvas>
+            </div>
+            <div class="src">Källa: SDwork Excel-export + Prognos P04 + Målprocess 2026</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Prognos P04 — Netto per bolag Jun–Dec 2026</div>
+            <div class="card-sub">Summerat netto Jun–Dec · Färg = affärsområde</div>
+            <div class="chart-wrap" style="height:420px;">
+                <canvas id="prognosAoChart"></canvas>
+            </div>
+            <div class="src">Källa: Prognos P04 per bolag (Jun–Dec 2026)</div>
+        </div>
+    </div>
+
+    <!-- HR-insikter -->
+    <div class="sec">Strategiska HR-insikter — Maj 2026</div>
+    <div class="card">
+        <div class="card-title">Trender · Actions · Rekommendationer</div>
+        <div class="card-sub">Baserat på SDwork, Winningtemp och Netigate Jan–Maj 2026</div>
+        <div class="g33" style="margin-top:16px;gap:20px;">
+
+            <!-- Trender -->
+            <div style="border-left:3px solid #06A6A7;padding-left:14px;">
+                <div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#06A6A7;margin-bottom:10px;">Trender</div>
+                <div class="insight-item">
+                    <span class="b b-r" style="min-width:28px;text-align:center;">↓</span>
+                    <span><strong>Nettotapp −38 konsulter</strong> Jan–Maj. P04 förutspår fortsatt tapp Jun–Jul, sedan försiktig återhämtning från sep. Prognos helår: +6 netto — vs Målprocess +85. Gapet är 79 konsulter.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-r" style="min-width:28px;text-align:center;">!</span>
+                    <span><strong>HC Consulting 88% omsättning</strong> (annualiserat). Vibe 48%, Upphandling 43%, BT 32%. Fyra bolag är i kritisk zon — var och ett tappar snabbare än de rekryterar.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-y" style="min-width:28px;text-align:center;">→</span>
+                    <span><strong>23% byter till kund, 18% till konkurrent.</strong> Netigate NPS −2 (snitt 6.8/10). Det är inte "sugen på förändring" — konsulterna upplever ett bättre erbjudande någon annanstans.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-y" style="min-width:28px;text-align:center;">↗</span>
+                    <span><strong>Connect +60% omsättning</strong> trots positivt netto — hög rörlighet i båda riktningar. Ludwig Falkman 8 avslut, Kajsa Nordström Hertzell 5 — flest av alla chefer.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-gr" style="min-width:28px;text-align:center;">+</span>
+                    <span><strong>Next (+4), Elevate (+3), Connect (+2 netto)</strong> och HealthTech (+2) är bolagen som faktiskt växer. P04 ger dem fortsatt positiv prognos genom hösten.</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="border-left:3px solid #EFBD47;padding-left:14px;">
+                <div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#a07800;margin-bottom:10px;">Actions — nu</div>
+                <div class="insight-item">
+                    <span class="b b-r" style="min-width:28px;text-align:center;">1</span>
+                    <span><strong>Krismöte HC Consulting.</strong> 88% annualiserad omsättning med 7 avslut och 1 nyanställd är inte en trend — det är ett strukturellt problem. VD + HR in omgående.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-y" style="min-width:28px;text-align:center;">2</span>
+                    <span><strong>Konkurrentanalys på avgångsmönstret.</strong> 18% går till konkurrent — vilka? Vad erbjuder de? Matchade lönerevisioner och tydligare karriärvägar är lägsta insatsen.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-y" style="min-width:28px;text-align:center;">3</span>
+                    <span><strong>Chefsdialoger Ludwig Falkman &amp; Kajsa N.H.</strong> — 8 respektive 5 avslut. Inte för att ifrågasätta, utan för att ge rätt stöd. Korrelera med deras WT-index.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-y" style="min-width:28px;text-align:center;">4</span>
+                    <span><strong>Retentionsprogram Vibe &amp; Upphandling</strong> — båda visar 40%+ omsättning med P04 negativt framåt. Fokus: konsulter med 1–3 år på bolaget (peakrisk-perioden).</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-y" style="min-width:28px;text-align:center;">5</span>
+                    <span><strong>Aktivera Netigate-insikterna.</strong> Avgångsfaktorerna är nu tillgängliga per faktor. Koppla top-3 faktorer till konkreta åtgärder — ta det till nästa ledningsgruppsmöte.</span>
+                </div>
+            </div>
+
+            <!-- Rekommendationer -->
+            <div style="border-left:3px solid #DF668A;padding-left:14px;">
+                <div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#DF668A;margin-bottom:10px;">Rekommendationer — Q3</div>
+                <div class="insight-item">
+                    <span class="b b-r" style="min-width:28px;text-align:center;">★</span>
+                    <span><strong>Målprocessgapet på 79 konsulter kräver ett nytt scenario.</strong> P04 +6 vs Målprocess +85 — antingen revideras Målprocess ned, eller sätts en exceptionell rekryteringsplan för H2.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-r" style="min-width:28px;text-align:center;">★</span>
+                    <span><strong>Bygg early-warning per chef.</strong> WT-index &lt; 7.0 + ≥2 avslut/kvartal = automatisk HR-flagga. Datan finns redan — sätt upp triggern i nästa Winningtemp-körning.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-r" style="min-width:28px;text-align:center;">★</span>
+                    <span><strong>Gör Next, Elevate och HealthTech till benchmarks.</strong> De växer medan andra krymper — samma marknad, olika utfall. Vad gör de annorlunda med ledarskap och uppdragsmix?</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-r" style="min-width:28px;text-align:center;">★</span>
+                    <span><strong>23% kundavgångar är intäktsrisk, inte bara HR-risk.</strong> Varje avgång till kund = ett konsultkontrakt som försvinner. Synliggör detta i nästa styrelserapport med kronor, inte procent.</span>
+                </div>
+                <div class="insight-item">
+                    <span class="b b-r" style="min-width:28px;text-align:center;">★</span>
+                    <span><strong>NPS −2 är ett varningssystem.</strong> Snitt 6.8/10 innebär att de flesta konsulter är passiva — inte lojala, inte aktiva avgångare. Det är det farligaste läget: de lämnar när rätt tillfälle uppstår.</span>
+                </div>
+            </div>
+
+        </div>
+        <div class="src" style="margin-top:16px;">Källa: SDwork · Winningtemp · Netigate exit survey (n=211) · P04-prognos per affärsområde</div>
+    </div>
+
+</div>
+
+<div class="page-footer"></div>
+
+<script>
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#888';
+
+const TEAL  = '#06A6A7';
+const PINK  = '#DF668A';
+const GOLD  = '#EFBD47';
+const BLUE  = '#426DA9';
+const DARK  = '#212121';
+const LIGHT = '#EEE8E4';
+const TEAL2 = '#008081';
+
+// Brutto in vs Avslut per månad (aktual + planerat)
+// Aktual: Jan-Maj | Planerat: Jun-Sep
+new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun*', 'Jul*', 'Aug*', 'Sep*'],
+        datasets: [
+            {
+                label: 'Brutto in (aktual)',
+                data: [6, 9, 7, 9, 5, null, null, null, null],
+                backgroundColor: TEAL, borderRadius: 4, stack: 'in'
+            },
+            {
+                label: 'Brutto in (planerat)',
+                data: [null, null, null, null, null, 0, 0, 2, 8],
+                backgroundColor: TEAL + '66', borderRadius: 4, stack: 'in'
+            },
+            {
+                label: 'Avslut (aktual)',
+                data: [9, 8, 13, 11, 16, null, null, null, null],
+                backgroundColor: PINK, borderRadius: 4, stack: 'ut'
+            },
+            {
+                label: 'Avslut (planerat)',
+                data: [null, null, null, null, null, 8, 6, 5, 5],
+                backgroundColor: PINK + '66', borderRadius: 4, stack: 'ut'
+            }
+        ]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f0ece8' } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// Netto kumulativt (aktual Jan-Maj + prognos Jun-Dec)
+new Chart(document.getElementById('nettoChart'), {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun*', 'Jul*', 'Aug*', 'Sep*'],
+        datasets: [
+            {
+                label: 'Kum. netto (aktual)',
+                data: [-3, -2, -8, -10, -21, null, null, null, null],
+                borderColor: PINK,
+                backgroundColor: 'rgba(223,102,138,0.08)',
+                fill: true, tension: 0.35, borderWidth: 2.5,
+                pointBackgroundColor: PINK, pointRadius: 4,
+            },
+            {
+                label: 'Kum. netto (prognos P04)',
+                data: [null, null, null, null, -21, -29, -35, -30, -25],
+                borderColor: PINK,
+                fill: false, tension: 0.35, borderWidth: 2,
+                borderDash: [5,4],
+                pointBackgroundColor: PINK, pointRadius: 3,
+            },
+            {
+                label: 'Ack. brutto in',
+                data: [6, 15, 22, 31, 36, null, null, null, null],
+                borderColor: TEAL,
+                fill: false, tension: 0.35, borderWidth: 2,
+                borderDash: [4,3],
+                pointBackgroundColor: TEAL, pointRadius: 3,
+            }
+        ]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } } },
+        scales: {
+            y: { grid: { color: '#f0ece8' } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// Avgångsorsak (Jan-Maj 2026 aktual)
+new Chart(document.getElementById('reasonChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Egen begäran (47)', 'Ej förläng. prov (3)', 'Överenskommelse (3)', 'Dödsfall (1)', 'Pension (1)', 'Arb.brist (1)', 'Avskedande (1)'],
+        datasets: [{
+            data: [47, 3, 3, 1, 1, 1, 1],
+            backgroundColor: [GOLD, TEAL, BLUE, '#888', '#aaa', '#426DA9cc', PINK],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false, cutout: '58%',
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, padding: 5, font: { size: 10 } } } }
+    }
+});
+
+// Vart byter de jobb — Eigen begäran Jan-Maj
+new Chart(document.getElementById('byterTillChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Övrigt', 'Kund', 'Konkurrent', 'Produktbolag', 'Startar eget'],
+        datasets: [{
+            label: 'Antal',
+            data: [18, 13, 10, 7, 4],
+            backgroundColor: ['#bbb', TEAL, PINK, GOLD, BLUE],
+            borderRadius: 4
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false },
+            tooltip: { callbacks: { label: ctx => {
+                const pct = Math.round(ctx.raw / 57 * 100);
+                return ` ${ctx.raw} st (${pct}% av avslut)`;
+            }}}
+        },
+        scales: {
+            x: { beginAtZero: true, grid: { color: '#f0ece8' } },
+            y: { grid: { display: false } }
+        }
+    }
+});
+
+// Kön — nyanställda vs avslut (grupperat stapeldiagram)
+new Chart(document.getElementById('konChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Man', 'Kvinna'],
+        datasets: [
+            { label: 'Nyanställda', data: [25, 11], backgroundColor: TEAL, borderRadius: 4 },
+            { label: 'Avslut',      data: [36, 21], backgroundColor: PINK, borderRadius: 4 }
+        ]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, padding: 12 } } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f0ece8' } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// Anställningstid vid avslut (Jan-Maj aktual)
+new Chart(document.getElementById('tenureChart'), {
+    type: 'bar',
+    data: {
+        labels: ['< 6 mån', '6–12 mån', '1–2 år', '2–3 år', '3–5 år', '5–10 år', '10+ år'],
+        datasets: [{
+            label: 'Antal avslut',
+            data: [6, 4, 9, 4, 19, 13, 2],
+            backgroundColor: [TEAL, TEAL, GOLD, GOLD, PINK, BLUE, '#426DA9cc'],
+            borderRadius: 4
+        }]
+    },
+    options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, grid: { color: '#f0ece8' }, ticks: { stepSize: 5 } },
+            y: { grid: { display: false } }
+        }
+    }
+});
+
+// Säsongsmönster — in vs ut per månad (aktual + planerat)
+new Chart(document.getElementById('seasonChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun*', 'Jul*', 'Aug*', 'Sep*'],
+        datasets: [
+            { label: 'Nyanställda', data: [6, 9, 7, 9, 5, 0, 0, 2, 8], backgroundColor: TEAL, borderRadius: 3 },
+            { label: 'Avslut',      data: [9, 8, 13, 11, 16, 8, 6, 5, 5], backgroundColor: PINK, borderRadius: 3 }
+        ]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, padding: 12 } } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f0ece8' } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// Bolag chart - top 8 by exits Jan-Maj 2026
+new Chart(document.getElementById('bolagChart'), {
+    type: 'bar',
+    data: {
+        labels: ['B3 HC Cons.', 'B3 Vibe', 'B3 Skilled', 'B3 Upphandling', 'B3 Bus.Transf.', 'B3 Digital WL', 'B3 Financial', 'B3 Beyond'],
+        datasets: [
+            { label: 'Brutto in', data: [1, 4, 1, 1, 0, 2, 3, 1], backgroundColor: TEAL, borderRadius: 3 },
+            { label: 'Avslut',    data: [7, 7, 5, 5, 5, 3, 3, 3], backgroundColor: PINK, borderRadius: 3 }
+        ]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, padding: 12 } } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: '#f0ece8' } },
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+        }
+    }
+});
+
+// ── Prognos P04 vs Utfall vs Målprocess — Ackumulerat netto ──────────────
+// Aktual Jan-Maj, Prognos P04 Jun-Dec, Målprocess 2026 (hela året)
+new Chart(document.getElementById('prognosChart'), {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'],
+        datasets: [
+            {
+                label: 'Utfall (aktual)',
+                data: [-3, -2, -8, -10, -21, null, null, null, null, null, null, null],
+                borderColor: PINK, backgroundColor: 'rgba(223,102,138,0.1)',
+                fill: true, tension: 0.3, borderWidth: 2.5,
+                pointBackgroundColor: PINK, pointRadius: 4,
+            },
+            {
+                label: 'Prognos P04',
+                data: [null, null, null, null, -21, -30, -41, -33, -13, -1, 9, 6],
+                borderColor: GOLD,
+                fill: false, tension: 0.3, borderWidth: 2,
+                borderDash: [5, 4],
+                pointBackgroundColor: GOLD, pointRadius: 3,
+            },
+            {
+                label: 'Målprocess 2026',
+                data: [-5, 11, 28, 40, 48, 46, 47, 51, 71, 78, 86, 85],
+                borderColor: TEAL,
+                fill: false, tension: 0.3, borderWidth: 1.5,
+                borderDash: [3, 3],
+                pointBackgroundColor: TEAL, pointRadius: 2,
+            }
+        ]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 10 } } } },
+        scales: {
+            y: { grid: { color: '#f0ece8' },
+                 ticks: { callback: v => v > 0 ? '+'+v : v } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// ── Prognos P04 — per bolag Jun–Dec netto total ──────────────────────────
+// Sorterat per affärsområde, sedan fallande netto inom varje grupp
+(function() {
+    // [namn, Jun-Dec netto, affärsområde]
+    const rows = [
+        // ── Development (teal) ──
+        ['B3 Next AB',              6,    'D'],
+        ['B3 Connect AB',           4,    'D'],
+        ['B3 Commit AB',            3,    'D'],
+        ['B3 Vibe AB',              3,    'D'],
+        ['B3 Init AB',              2,    'D'],
+        ['B3 Innovation AB',        1,    'D'],
+        ['B3 CodeRight AB',         1,    'D'],
+        ['B3 Engage AB',            0,    'D'],
+        ['B3 Reach Consulting AB',  0,    'D'],
+        ['Rebel and Bird AB',      -1,    'D'],
+        ['B3 Mobile AB',           -1,    'D'],
+        // ── Management (blue) ──
+        ['B3 Upphandling AB',       6,    'M'],
+        ['B3 Indes AB',             3,    'M'],
+        ['B3 Financial Consulting AB', 2, 'M'],
+        ['B3 Elevate AB',           1,    'M'],
+        ['B3 HealthTech AB',        0,    'M'],
+        ['B3 Business Transformation AB', -2, 'M'],
+        ['B3 Visab Consulting AB', -2.5,  'M'],
+        ['B3 Healthcare Consulting AB', -4, 'M'],
+        // ── Cloud & Technology (gold) ──
+        ['B3 Networks AB',          3,    'C'],
+        ['B3 Digital Worklife AB',  2,    'C'],
+        ['B3 Secure AB',            2,    'C'],
+        ['B3 Summit AB',            0,    'C'],
+        ['B3 Cloud Services AB',    0,    'C'],
+        ['B3 Beyond AB',            0,    'C'],
+        ['B3 DBAce AB',            -1,    'C'],
+        ['B3 Skilled AB',          -1,    'C'],
+    ];
+
+    const colorMap = { D: TEAL, M: BLUE, C: GOLD };
+    const shorten  = s => s.replace('B3 ', '').replace(' Consulting AB','').replace(' AB','').replace(' and Bird','& Bird');
+
+    new Chart(document.getElementById('prognosAoChart'), {
+        type: 'bar',
+        data: {
+            labels: rows.map(r => shorten(r[0])),
+            datasets: [{
+                data:            rows.map(r => r[1]),
+                backgroundColor: rows.map(r => colorMap[r[2]]),
+                borderRadius: 3,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: {
+                    title: ctx => rows[ctx[0].dataIndex][0],
+                    label: ctx => ` Netto Jun–Dec: ${ctx.raw > 0 ? '+' : ''}${ctx.raw}`,
+                    afterLabel: ctx => {
+                        const ao = rows[ctx.dataIndex][2];
+                        return ao === 'D' ? 'Development' : ao === 'M' ? 'Management' : 'Cloud & Technology';
+                    }
+                }}
+            },
+            scales: {
+                x: { grid: { color: '#f0ece8' }, ticks: { callback: v => v > 0 ? '+'+v : v }, },
+                y: { grid: { display: false }, ticks: { font: { size: 10 }, crossAlign: 'far' } }
+            }
+        }
+    });
+
+    // Legend
+    const legItems = [['Development',TEAL],['Management',BLUE],['Cloud & Technology',GOLD]];
+    const legEl = document.createElement('div');
+    legEl.style.cssText = 'display:flex;gap:14px;justify-content:center;margin-top:8px;font-size:10px;color:#666;';
+    legItems.forEach(([label, color]) => {
+        const s = document.createElement('span');
+        s.innerHTML = `<span style="display:inline-block;width:10px;height:10px;background:${color};border-radius:2px;margin-right:4px;vertical-align:middle;"></span>${label}`;
+        legEl.appendChild(s);
+    });
+    document.getElementById('prognosAoChart').closest('.card').appendChild(legEl);
+})();
+
+</script>
+
+<!-- Winningtemp live-data — inbäddad direkt av hamta_winningtemp.py -->
+<script id="winningtemp-inline">// WT_DATA_START
+window.WINNINGTEMP_DATA = null;
+// WT_DATA_END
+</script>
+
+<!-- Netigate live-data — inbäddad direkt av hamta_netigate.py -->
+<script id="netigate-inline">// NT_DATA_START
+window.NETIGATE_DATA = null;
+// NT_DATA_END
+</script>
+
+<script>
+// SDwork-avslut per chef (normaliserat — alla dubbla mellanslag borttagna)
+const CHEF_AVSLUT = {
+    "Ludwig Falkman": 8, "Kajsa Nordström Hertzell": 5, "Patrik Zlatkovic": 5,
+    "Daniella Meyerson": 4, "Per-Ola Löwing": 4, "Christian Bratt": 3,
+    "Åsa Hofvander": 3, "Kenneth Andersson": 3, "Göran Hising": 3, "Hanna Winsö": 3,
+    "Andreas Hammarbäck": 2, "Angelique Eskilstorp": 2, "Christina Rizu Löfgren": 2,
+    "Katarina Appelqvist": 2, "Eva Clavin": 2, "Pernilla Nilsson": 2, "Peter Lager": 2,
+    "Ola Mellberg": 2, "Cathrine Yankoulofski": 2, "Mats Erkers": 2,
+    "Anders Löfqvist": 2, "Claes Vikell": 2,
+    "Anna Abrahamsson Hägg": 1, "Malin Heyman": 1, "Tomas Kaipe": 1, "Rickard Wallén": 1,
+    "Jenny Aldensand": 1, "Jonas Klingstedt": 1, "Andreas Ljungquist": 1,
+    "Maria Svalstedt Malmén": 1, "Camilla Landén": 1, "Emil Lundgren": 1,
+    "Ola Enebro": 1, "Jocke Ginsburg": 1, "Jenny Sjöholm": 1, "Ann-Charlotte Olsson": 1,
+    "Anders Bergman": 1, "Magnus Cronberg": 1, "Melinda Petzén": 1,
+    "Johan Hansson": 1, "Terese Karlsson": 1,
+};
+
+// Normalisera namn (ta bort dubbla mellanslag, trim)
+function normName(s) { return (s || '').replace(/\s+/g, ' ').trim(); }
+
+// ── Headcount snapshot maj 2026 (exkl. B3 Zenith & B3 Now) ────────────
+// B3 Cloud Services + Digital Worklife + Summit = kluster "B3 Cloud (kluster)"
+// B3 Elevate Consulting + Elevate Group = "B3 Elevate AB"
+const HEADCOUNT = {
+    "B3 Skilled AB":                   51,
+    "B3 Business Transformation AB":   38,
+    "B3 HealthTech AB":                37,
+    "B3 Vibe AB":                      35,
+    "B3 Cloud (kluster)":              30,   // Cloud Services 6 + Digital Worklife 23 + Summit 1
+    "B3 Init AB":                      28,
+    "B3 Upphandling AB":               28,
+    "Rebel and Bird AB":               25,
+    "B3 Financial Consulting AB":      23,
+    "B3 Networks AB":                  22,
+    "B3 Elevate AB":                   22,   // Consulting 18 + Group 4
+    "B3 Innovation AB":                21,
+    "B3 Commit AB":                    20,
+    "B3 Visab Consulting AB":          20,
+    "B3 CodeRight AB":                 19,
+    "B3 Healthcare Consulting AB":     19,
+    "B3 Indes AB":                     19,
+    "B3 Engage AB":                    17,
+    "B3 DBAce AB":                     15,
+    "B3 Mobile AB":                    12,
+    "B3 Next AB":                      10,
+    "B3 Connect AB":                    8,
+    "B3 Secure AB":                     3,
+    "B3 Reach Consulting AB":           3,
+    // Summit ingår i Cloud (kluster) ovan
+};
+// Total: 525 aktiva konsulter
+
+// ── Omsättningsfrekvens — annualiserad (avslut Jan-Maj / hc × 12/5) ────
+// Sorterat på fallande rate, exkl. bolag utan headcount-match
+(function buildTurnoverChart() {
+    // exits Jan-Maj per bolag (Cloud-kluster merged)
+    const exits = {
+        "B3 Healthcare Consulting AB":   7,
+        "B3 Connect AB":                 2,
+        "B3 Vibe AB":                    7,
+        "B3 Upphandling AB":             5,
+        "B3 Business Transformation AB": 5,
+        "B3 Financial Consulting AB":    3,
+        "B3 Cloud (kluster)":            3,
+        "B3 CodeRight AB":               2,
+        "B3 Indes AB":                   2,
+        "B3 Commit AB":                  2,
+        "B3 Visab Consulting AB":        2,
+        "B3 Skilled AB":                 5,
+        "B3 Innovation AB":              2,
+        "B3 Networks AB":                2,
+        "Rebel and Bird AB":             2,
+        "B3 Mobile AB":                  1,
+        "B3 Engage AB":                  1,
+        "B3 HealthTech AB":              1,
+    };
+
+    const MONTHS = 5;
+    const rates = Object.entries(exits)
+        .map(([co, e]) => {
+            const hc = HEADCOUNT[co];
+            if (!hc) return null;
+            return { co: co.replace('B3 ', '').replace(' AB','').replace(' Consulting','').replace(' Worklife',''),
+                     full: co, e, hc,
+                     ann: Math.round(e / hc * 12 / MONTHS * 100) };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.ann - a.ann);
+
+    const labels = rates.map(r => r.co);
+    const data   = rates.map(r => r.ann);
+    const colors = data.map(v => v >= 40 ? PINK : v >= 25 ? GOLD : TEAL);
+
+    new Chart(document.getElementById('turnoverChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Annualiserad omsättning %',
+                data,
+                backgroundColor: colors,
+                borderRadius: 3,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => {
+                    const r = rates[ctx.dataIndex];
+                    return ` ${r.ann}% (${r.e} avslut / ${r.hc} hc)`;
+                }}}
+            },
+            scales: {
+                x: { beginAtZero: true, grid: { color: '#f0ece8' },
+                     ticks: { callback: v => v + '%' } },
+                y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+            }
+        }
+    });
+
+    // Headcount chart — alla bolag sorterat fallande
+    const hcSorted = Object.entries(HEADCOUNT)
+        .sort((a,b) => b[1]-a[1])
+        .map(([n,v]) => ({ n: n.replace('B3 ','').replace(' AB',''), v }));
+
+    new Chart(document.getElementById('headcountChart'), {
+        type: 'bar',
+        data: {
+            labels: hcSorted.map(r => r.n),
+            datasets: [{
+                label: 'Headcount',
+                data: hcSorted.map(r => r.v),
+                backgroundColor: TEAL + 'bb',
+                borderRadius: 3,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.raw} konsulter` }} },
+            scales: {
+                x: { beginAtZero: true, grid: { color: '#f0ece8' } },
+                y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+            }
+        }
+    });
+})();
+
+// ── Per-bolag data (SDwork Excel Jan–Maj 2026 aktual) ──────────────────
+// REGEL: Exkl. B3 Zenith AB & B3 Now AB · Exkl. OH-personal
+const BOLAG_DATA = [
+    // Sorterat: flest avslut → flest nyanställda
+    { n: "B3 Healthcare Consulting AB",     h: 1,  e: 7 },
+    { n: "B3 Vibe AB",                      h: 4,  e: 7 },
+    { n: "B3 Skilled AB",                   h: 1,  e: 5 },
+    { n: "B3 Upphandling AB",               h: 1,  e: 5 },
+    { n: "B3 Business Transformation AB",   h: 0,  e: 5 },
+    { n: "B3 Digital Worklife AB",          h: 2,  e: 3 },
+    { n: "B3 Financial Consulting AB",      h: 3,  e: 3 },
+    { n: "B3 Beyond AB",                    h: 1,  e: 3 },
+    { n: "B3 CodeRight AB",                 h: 0,  e: 2 },
+    { n: "B3 Commit AB",                    h: 1,  e: 2 },
+    { n: "B3 Connect AB",                   h: 4,  e: 2 },
+    { n: "B3 Indes AB",                     h: 3,  e: 2 },
+    { n: "B3 Innovation AB",                h: 0,  e: 2 },
+    { n: "B3 Networks AB",                  h: 0,  e: 2 },
+    { n: "B3 Visab Consulting AB",          h: 2,  e: 2 },
+    { n: "Rebel and Bird AB",               h: 2,  e: 2 },
+    { n: "B3 Engage AB",                    h: 0,  e: 1 },
+    { n: "B3 HealthTech AB",                h: 3,  e: 1 },
+    { n: "B3 Mobile AB",                    h: 0,  e: 1 },
+    { n: "B3 Elevate AB",                   h: 3,  e: 0 },
+    { n: "B3 Next AB",                      h: 4,  e: 0 },
+    { n: "B3 Secure AB",                    h: 1,  e: 0 },
+    { n: "B3 Cloud Services AB",            h: 0,  e: 0 },
+    { n: "B3 Init AB",                      h: 0,  e: 0 },
+    { n: "B3 DBAce AB",                     h: 0,  e: 0 },
+];
+
+// ── Prognos P04 netto Jun–Dec 2026 per bolag (faktiska siffror från Excel) ─
+const PROGNOS_P04 = {
+    // Development
+    "B3 Next AB":                       6,
+    "B3 Connect AB":                    4,
+    "B3 Commit AB":                     3,
+    "B3 Vibe AB":                       3,
+    "B3 Init AB":                       2,
+    "B3 Innovation AB":                 1,
+    "B3 CodeRight AB":                  1,
+    "B3 Engage AB":                     0,
+    "B3 Reach Consulting AB":           0,
+    "Rebel and Bird AB":               -1,
+    "B3 Mobile AB":                    -1,
+    // Management
+    "B3 Upphandling AB":                6,
+    "B3 Indes AB":                      3,
+    "B3 Financial Consulting AB":       2,
+    "B3 Elevate AB":                    1,
+    "B3 HealthTech AB":                 0,
+    "B3 Business Transformation AB":   -2,
+    "B3 Visab Consulting AB":          -3,   // -2.5 avrundat
+    "B3 Healthcare Consulting AB":     -4,
+    // Cloud & Technology
+    "B3 Networks AB":                   3,
+    "B3 Digital Worklife AB":           2,
+    "B3 Secure AB":                     2,
+    "B3 Summit AB":                     0,
+    "B3 Cloud Services AB":             0,
+    "B3 Beyond AB":                     0,
+    "B3 DBAce AB":                     -1,
+    "B3 Skilled AB":                   -1,
+};
+// P04-lookup: Cloud-kluster slår upp per ingående bolag direkt
+const p04Lookup = n => {
+    if (n === 'B3 Elevate Consulting AB' || n === 'B3 Elevate Group AB')
+        return PROGNOS_P04['B3 Elevate AB'];
+    return PROGNOS_P04[n] ?? null;
+};
+
+(function renderBolagTable() {
+    const tbody = document.getElementById('bolag-tbody');
+    if (!tbody) return;
+    let totH = 0, totE = 0;
+
+    // Cloud-kluster: merge Cloud Services + Summit into Digital Worklife for headcount lookup
+    // B3 Beyond AB ingår nu i B3 Skilled (ej eget HC-entry)
+    const hcLookup = n => {
+        if (n === 'B3 Digital Worklife AB' || n === 'B3 Cloud Services AB' || n === 'B3 Summit AB')
+            return HEADCOUNT['B3 Cloud (kluster)'];
+        if (n.includes('Elevate')) return HEADCOUNT['B3 Elevate AB'];
+        if (n === 'B3 Beyond AB') return HEADCOUNT['B3 Skilled AB'];
+        return HEADCOUNT[n] || null;
+    };
+
+    BOLAG_DATA.forEach(({ n, h, e }) => {
+        totH += h; totE += e;
+        const netto = h - e;
+        const nettoHtml = netto > 0  ? `<span class="b b-g">+${netto}</span>`
+                        : netto < 0  ? `<span class="b b-r">−${Math.abs(netto)}</span>`
+                        : `<span class="b b-gr">0</span>`;
+
+        // Headcount
+        const hc = hcLookup(n);
+        const hcHtml = hc ? hc : '<span style="color:#ccc;">—</span>';
+
+        // Omsättningsfrekvens annualiserad
+        let omsHtml = '<span style="color:#ccc;">—</span>';
+        if (hc && e > 0) {
+            const pct = Math.round(e / hc * 12 / 5 * 100);
+            const cls = pct >= 40 ? 'neg' : pct >= 25 ? 'neu' : 'pos';
+            const bCls = pct >= 40 ? 'b-r' : pct >= 25 ? 'b-y' : 'b-g';
+            omsHtml = `<span class="b ${bCls}">${pct}%</span>`;
+        } else if (hc && e === 0) {
+            omsHtml = '<span class="b b-g">0%</span>';
+        }
+
+        // Avslut/Brutto ratio
+        let ratioHtml = '—';
+        if (h > 0) {
+            const pct = Math.round(e / h * 100);
+            const cls = pct >= 100 ? 'pf-r' : pct >= 60 ? 'pf-y' : 'pf-g';
+            const txtCls = pct >= 100 ? 'neg' : pct >= 60 ? 'neu' : 'pos';
+            ratioHtml = `<span class="pb"><span class="pf ${cls}" style="width:${Math.min(pct,100)}%"></span></span>&nbsp;<span class="${txtCls}" style="font-size:10px;font-weight:700;">${pct}%</span>`;
+        }
+
+        // P04 Jun–Dec netto
+        const p04val = p04Lookup(n);
+        let p04Html = '<span style="color:#ccc;">—</span>';
+        if (p04val !== null) {
+            if (p04val > 0)       p04Html = `<span class="b b-g">+${p04val}</span>`;
+            else if (p04val < 0)  p04Html = `<span class="b b-r">${p04val}</span>`;
+            else                  p04Html = `<span class="b b-gr">0</span>`;
+        }
+
+        const bold = e >= 5 || netto <= -4;
+        const nameHtml = bold ? `<strong>${n}</strong>` : n;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${nameHtml}</td><td>${h}</td><td>${e}</td><td>${nettoHtml}</td><td>${hcHtml}</td><td>${omsHtml}</td><td>${ratioHtml}</td><td>${p04Html}</td>`;
+        tbody.appendChild(tr);
+    });
+
+    // Total row
+    const totP04 = Object.values(PROGNOS_P04).reduce((a, b) => a + b, 0);
+    const totNetto = totH - totE;
+    const totalHC = 525;
+    const totOms = Math.round(totE / totalHC * 12 / 5 * 100);
+    const totP04Html = totP04 > 0 ? `<span class="b b-g">+${totP04}</span>` : `<span class="b b-r">${totP04}</span>`;
+    const tr = document.createElement('tr');
+    tr.className = 'total-row';
+    tr.innerHTML = `<td>Totalt (alla bolag)</td><td><strong>${totH}</strong></td><td><strong>${totE}</strong></td><td><span class="b b-r"><strong>−${Math.abs(totNetto)}</strong></span></td><td><strong>${totalHC}</strong></td><td><span class="b b-y"><strong>${totOms}%</strong></span></td><td>—</td><td>${totP04Html}</td>`;
+    tbody.appendChild(tr);
+})();
+
+function renderWinningtemp(data) {
+    const waiting = document.getElementById('wt-waiting');
+    const loaded  = document.getElementById('wt-loaded');
+    const status  = document.getElementById('wt-status');
+    const src     = document.getElementById('wt-src');
+
+    if (!data) return;
+
+    waiting.style.display = 'none';
+    loaded.style.display  = 'block';
+
+    const fetchedAt = new Date(data.fetched_at).toLocaleString('sv-SE');
+    status.textContent = `Uppdaterad: ${fetchedAt}`;
+    src.textContent    = `Källa: Winningtemp API · ${fetchedAt}`;
+
+    // ── Period label ──────────────────────────────────────────────────────
+    if (data.query_periods?.current) {
+        document.getElementById('wt-period').textContent =
+            `${data.query_periods.current.start} → ${data.query_periods.current.end}`;
+    }
+
+    // ── Manager table ─────────────────────────────────────────────────────
+    // matched_managers already has pre-computed score_current / score_prev
+    const tbody  = document.getElementById('wt-manager-body');
+    const alerts = document.getElementById('wt-alerts');
+    tbody.innerHTML  = '';
+    alerts.innerHTML = '';
+
+    const matched = data.matched_managers || [];
+
+    // Sortera: flest avslut först, sedan fallande index
+    const sorted = [...matched].sort((a, b) => {
+        const aEx = CHEF_AVSLUT[normName(a.manager_name)] ?? 0;
+        const bEx = CHEF_AVSLUT[normName(b.manager_name)] ?? 0;
+        if (bEx !== aEx) return bEx - aEx;
+        return (b.score_current ?? 0) - (a.score_current ?? 0);
+    });
+
+    sorted.forEach(m => {
+        const chef     = normName(m.manager_name);
+        const teamName = m.team_name || '—';
+        const avslut   = CHEF_AVSLUT[chef] ?? 0;
+        const cur      = m.score_current ?? null;
+        const prev     = m.score_prev    ?? null;
+        const trend    = (cur !== null && prev !== null)
+                         ? (cur - prev).toFixed(1) : null;
+
+        // Visa bara chefer med avslut ELLER lågt index
+        const hasExits    = avslut > 0;
+        const lowIndex    = cur !== null && cur < 7.0;
+        const fallingFast = trend !== null && parseFloat(trend) < -0.5;
+        if (!hasExits && !lowIndex && !fallingFast) return;
+
+        renderManagerRow(tbody, chef, teamName, avslut, cur, trend);
+
+        if (cur !== null && cur < 6.0) {
+            addAlert(alerts, 'al-r', `🔴 ${chef}: Ledarskapsindex ${cur} — under 6.0`);
+        } else if (fallingFast) {
+            addAlert(alerts, 'al-w', `⚠ ${chef}: Index fallande ${trend} senaste perioden`);
+        }
+    });
+
+    // ── WT Scatter: index vs avslut per chef ─────────────────────────────
+    const scatterWaiting = document.getElementById('wt-scatter-waiting');
+    const scatterLoaded  = document.getElementById('wt-scatter-loaded');
+    const riskWaiting    = document.getElementById('wt-risk-waiting');
+    const riskBody       = document.getElementById('wt-risk-body');
+
+    const scatterPoints = matched
+        .filter(m => m.score_current !== null)
+        .map(m => {
+            const chef = normName(m.manager_name);
+            return {
+                x: m.score_current,
+                y: CHEF_AVSLUT[chef] ?? 0,
+                label: chef,
+            };
+        });
+
+    if (scatterPoints.length > 0 && scatterWaiting && scatterLoaded) {
+        scatterWaiting.style.display = 'none';
+        scatterLoaded.style.display  = 'block';
+
+        const pointColors = scatterPoints.map(p =>
+            (p.x < 7 && p.y >= 2) ? PINK :
+            (p.x < 7)             ? GOLD :
+            (p.y >= 3)            ? '#DF668Acc' : TEAL + 'aa');
+
+        new Chart(document.getElementById('wtScatterChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Chefer',
+                    data: scatterPoints,
+                    backgroundColor: pointColors,
+                    pointRadius: scatterPoints.map(p => 5 + p.y * 1.5),
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: {
+                        label: ctx => `${ctx.raw.label}: index ${ctx.raw.x}, avslut ${ctx.raw.y}`
+                    }}
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Ledarskapsindex (WT)' },
+                         min: 0, max: 10, grid: { color: '#f0ece8' } },
+                    y: { title: { display: true, text: 'Antal avslut' },
+                         beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f0ece8' } }
+                }
+            }
+        });
+
+        // Riskmatris
+        if (riskWaiting && riskBody) {
+            riskWaiting.style.display = 'none';
+            riskBody.style.display    = 'block';
+            const riskChefs = scatterPoints
+                .filter(p => p.x < 7.5 || p.y >= 2)
+                .sort((a,b) => {
+                    const riskA = (10 - a.x) * 2 + a.y;
+                    const riskB = (10 - b.x) * 2 + b.y;
+                    return riskB - riskA;
+                })
+                .slice(0, 8);
+
+            riskChefs.forEach(p => {
+                const cls = (p.x < 7 && p.y >= 2) ? 'al-r' : (p.x < 7) ? 'al-w' : 'al-gr';
+                const div = document.createElement('div');
+                div.className = `alert ${cls}`;
+                div.innerHTML = `<strong>${p.label}</strong> — WT ${p.x} · ${p.y} avslut`;
+                riskBody.appendChild(div);
+            });
+        }
+    }
+
+    // ── Monthly trend chart ───────────────────────────────────────────────
+    // monthly_trend has {label, score, notEnoughData} per month
+    const monthly = data.monthly_trend || [];
+    const monthValues = monthly.map(m => m.notEnoughData ? null : (m.score ?? null));
+
+    const ctx = document.getElementById('wtTrendChart').getContext('2d');
+    if (window._wtChart) window._wtChart.destroy();
+    window._wtChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: monthly.map(m => m.label),
+            datasets: [{
+                label: 'Ledarskapsindex (snitt)',
+                data: monthValues,
+                borderColor: '#06A6A7',
+                backgroundColor: 'rgba(6,166,167,0.08)',
+                fill: true, tension: 0.3, borderWidth: 2.5,
+                pointBackgroundColor: '#06A6A7', pointRadius: 4,
+                spanGaps: true,
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { min: 0, max: 10, grid: { color: '#f0ece8' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+function renderManagerRow(tbody, chef, teamName, avslut, cur, trend) {
+    const tr = document.createElement('tr');
+
+    let idxHtml = '<span class="b b-gr">—</span>';
+    if (cur !== null) {
+        const pct   = Math.round(cur * 10);
+        const color = cur < 6 ? 'pf-r' : cur < 7 ? 'pf-y' : 'pf-g';
+        const txtC  = cur < 6 ? '#b0194a' : cur < 7 ? '#7a5a00' : '#005f60';
+        idxHtml = `<span class="pb"><span class="pf ${color}" style="width:${pct}%"></span></span>&nbsp;<strong style="color:${txtC}">${cur}</strong>`;
+    }
+
+    let trendHtml = '<span class="neu">—</span>';
+    if (trend !== null) {
+        const v = parseFloat(trend);
+        trendHtml = v > 0.1  ? `<span class="pos">↑ +${trend}</span>`
+                  : v < -0.1 ? `<span class="neg">↓ ${trend}</span>`
+                  : `<span class="neu">→ ${trend}</span>`;
+    }
+
+    const avslutBadge = avslut >= 5 ? `<span class="b b-r">${avslut}</span>`
+                      : avslut >= 3 ? `<span class="b b-y">${avslut}</span>`
+                      : `<span class="b b-gr">${avslut}</span>`;
+
+    tr.innerHTML = `
+        <td><strong>${chef}</strong></td>
+        <td style="font-size:11px;color:#888;">${teamName}</td>
+        <td>${avslutBadge}</td>
+        <td>${idxHtml}</td>
+        <td>${trendHtml}</td>
+    `;
+    tbody.appendChild(tr);
+}
+
+function addAlert(container, cls, text) {
+    const div = document.createElement('div');
+    div.className = `alert ${cls}`;
+    div.textContent = text;
+    container.appendChild(div);
+}
+
+// ── Netigate ──────────────────────────────────────────────────────────────
+function renderNetigate(data) {
+    if (!data) return;
+    const waiting = document.getElementById('netigate-waiting');
+    const loaded  = document.getElementById('netigate-loaded');
+    const secNote = document.getElementById('netigate-sec-note');
+    if (!waiting || !loaded) return;
+
+    waiting.style.display = 'none';
+    loaded.style.display  = 'grid';
+
+    const fetchedAt = new Date(data.fetched_at).toLocaleString('sv-SE', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    secNote.textContent = `Survey ${data.survey_id} · ${data.total_responses} svar · ${fetchedAt}`;
+
+    // ── NPS ───────────────────────────────────────────────────────────────
+    const nps = data.nps;
+    if (nps) {
+        const score = nps.score;
+        const scoreEl = document.getElementById('nt-nps-score');
+        const labelEl = document.getElementById('nt-nps-label');
+        const barsEl  = document.getElementById('nt-nps-bars');
+        const legEl   = document.getElementById('nt-nps-legend');
+
+        scoreEl.textContent = (score >= 0 ? '+' : '') + score;
+        scoreEl.style.color = score >= 30 ? '#06A6A7' : score >= 0 ? '#EFBD47' : '#DF668A';
+
+        const avg = nps.avg ?? '—';
+        labelEl.textContent = `Snitt ${avg}/10 · n=${nps.total}`;
+
+        // Stacked bar: promoters / passives / detractors
+        const n = nps.total;
+        const pPct = Math.round(nps.promoters  / n * 100);
+        const sPct = Math.round(nps.passives   / n * 100);
+        const dPct = 100 - pPct - sPct;
+        barsEl.innerHTML = `
+            <div style="flex:${pPct};background:#06A6A7;min-width:${pPct>0?'4px':'0'};"></div>
+            <div style="flex:${sPct};background:#EFBD47;min-width:${sPct>0?'4px':'0'};"></div>
+            <div style="flex:${dPct};background:#DF668A;min-width:${dPct>0?'4px':'0'};"></div>`;
+        legEl.innerHTML = `
+            <span style="color:#06A6A7;font-weight:700;">▮ Nöjda ${pPct}% (${nps.promoters})</span>
+            <span style="color:#a07800;font-weight:700;">▮ Passiva ${sPct}% (${nps.passives})</span>
+            <span style="color:#DF668A;font-weight:700;">▮ Kritiker ${dPct}% (${nps.detractors})</span>`;
+    } else {
+        document.getElementById('nt-nps-body').style.display = 'none';
+        document.getElementById('nt-nps-none').style.display = 'block';
+    }
+
+    // ── Avgångsfaktorer (MATRIX) ──────────────────────────────────────────
+    const factors = (data.exit_factors || []).slice(0, 8);
+    if (factors.length > 0) {
+        // Bryt långa etiketter i två rader vid ordgräns runt mitten
+        const wrapLabel = s => {
+            if (s.length <= 32) return s;
+            const mid = Math.floor(s.length / 2);
+            let cut = s.lastIndexOf(' ', mid);
+            if (cut < 10) cut = s.indexOf(' ', mid);
+            if (cut < 0) return s;
+            return [s.slice(0, cut), s.slice(cut + 1)];
+        };
+        new Chart(document.getElementById('factorChart'), {
+            type: 'bar',
+            data: {
+                labels: factors.map(f => wrapLabel(f.factor)),
+                datasets: [{
+                    label: 'Snitt (1–5)',
+                    data: factors.map(f => f.avg),
+                    backgroundColor: factors.map(f =>
+                        f.avg >= 4.0 ? TEAL :
+                        f.avg >= 3.0 ? GOLD : PINK),
+                    borderRadius: 3,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                layout: { padding: { left: 0 } },
+                plugins: { legend: { display: false },
+                    tooltip: { callbacks: {
+                        title: ctx => factors[ctx[0].dataIndex].factor,
+                        label: ctx => ` Snitt: ${ctx.raw} (n=${factors[ctx.dataIndex].count})`
+                    }}
+                },
+                scales: {
+                    x: { min: 1, max: 5, grid: { color: '#f0ece8' }, ticks: { stepSize: 1 } },
+                    y: {
+                        grid: { display: false },
+                        ticks: { font: { size: 10 }, crossAlign: 'far' }
+                    }
+                }
+            }
+        });
+    }
+
+    // ── Undersökningsöversikt ─────────────────────────────────────────────
+    document.getElementById('nt-resp-count').textContent = data.total_responses;
+    const rr = data.response_rate;
+    document.getElementById('nt-resp-rate').textContent = rr ? `${rr}%` : '—';
+
+    // Kön-badges
+    const genderEl = document.getElementById('nt-gender');
+    const gender   = data.gender || {};
+    const GENDER_COLORS = { 'Man': BLUE, 'Kvinna': PINK, 'Vill ej uppge': '#aaa' };
+    Object.entries(gender).forEach(([k, v]) => {
+        const col = GENDER_COLORS[k] || TEAL;
+        const span = document.createElement('span');
+        span.className = 'b';
+        span.style.cssText = `background:${col}22;color:${col};border:1px solid ${col}44;font-size:11px;`;
+        span.textContent = `${k}: ${v}`;
+        genderEl.appendChild(span);
+    });
+
+    // Anställningstid mini-bars
+    const tenureEl = document.getElementById('nt-tenure');
+    const tenure   = data.tenure_at_b3 || {};
+    const ORDER    = ['Kortare än 1 år', '1-2 år', '3-5 år', '6-10 år', '10 år eller mer'];
+    const tTotal   = Object.values(tenure).reduce((a, b) => a + b, 0) || 1;
+    ORDER.forEach(label => {
+        const count = tenure[label] ?? 0;
+        const pct   = Math.round(count / tTotal * 100);
+        const div   = document.createElement('div');
+        div.innerHTML = `
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-bottom:2px;">
+                <span>${label}</span><span><strong>${count}</strong> (${pct}%)</span>
+            </div>
+            <div style="height:6px;background:#f0ece8;border-radius:3px;overflow:hidden;">
+                <div style="height:100%;width:${pct}%;background:${TEAL};border-radius:3px;"></div>
+            </div>`;
+        tenureEl.appendChild(div);
+    });
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.WINNINGTEMP_DATA) {
+        renderWinningtemp(window.WINNINGTEMP_DATA);
+    }
+    if (window.NETIGATE_DATA) {
+        renderNetigate(window.NETIGATE_DATA);
+    }
+});
+</script>
+</body>
+</html>
